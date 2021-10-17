@@ -1,19 +1,23 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
 
-describe("Greeter", function () {
-  it("Should return the new greeting once it's changed", async function () {
-    const Greeter = await ethers.getContractFactory("Greeter");
-    const greeter = await Greeter.deploy("Hello, world!");
-    await greeter.deployed();
+describe("BlockdemyLoot", function () {
+  const setup = async ({ maxSupply = 1000 } = {}) => {
+    const [owner] = await ethers.getSigners();
+    const BlockdemyLoot = await ethers.getContractFactory("BlockdemyLoot");
+    const deployed = await BlockdemyLoot.deploy(maxSupply);
 
-    expect(await greeter.greet()).to.equal("Hello, world!");
+    return {
+      owner,
+      deployed,
+    };
+  };
 
-    const setGreetingTx = await greeter.setGreeting("Hola, mundo!");
+  it("Sets max supply to passed param", async function () {
+    const maxSupply = 10000;
 
-    // wait until the transaction is mined
-    await setGreetingTx.wait();
-
-    expect(await greeter.greet()).to.equal("Hola, mundo!");
+    const { deployed } = await setup({ maxSupply });
+    const returnedMaxSupply = await deployed.maxSupply();
+    expect(maxSupply).to.equal(returnedMaxSupply);
   });
 });
