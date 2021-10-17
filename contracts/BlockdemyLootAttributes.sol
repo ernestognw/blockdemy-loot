@@ -5,6 +5,7 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 
 contract BlockdemyLootAttributes {
     using Strings for uint256;
+    uint256 random;
 
     string[] private _profile = ["Trader", "Consultant", "Dev", "Lawyer"];
 
@@ -38,7 +39,7 @@ contract BlockdemyLootAttributes {
     string[] private _exchange = [
         "Coinbase",
         "Bitso",
-        "Uniswap"
+        "Uniswap",
         "Buda",
         "Kraken",
         "Binance"
@@ -63,19 +64,23 @@ contract BlockdemyLootAttributes {
         "Crypto News"
     ];
 
+    function setRandom(uint256 _random) internal {
+      random = _random;
+    }
+
     function deterministicNoise(string memory input)
         internal
-        pure
+        view
         returns (uint256)
     {
-        return uint256(keccak256(abi.encodePacked(input)));
+        return uint256(keccak256(abi.encodePacked(input, random)));
     }
 
     function getAttribute(
         uint256 tokenId,
         string memory keyPrefix,
         string[] memory sourceArray
-    ) private pure returns (string memory) {
+    ) private view returns (string memory) {
         uint256 noise = deterministicNoise(
             string(abi.encodePacked(keyPrefix, tokenId.toString()))
         );
